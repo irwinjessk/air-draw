@@ -10,9 +10,7 @@ Le projet s'appuie sur la **vision par ordinateur** (Computer Vision), le **suiv
 
 ▶️ **[Regarder la vidéo sur YouTube](https://youtu.be/D3BjOMaaXmA)**
 
-> 📸 *Ajoute ici un GIF de démonstration (`docs/demo.gif`) :*
->
-> `![Démo Air Draw](docs/demo.gif)`
+![Démo Air Draw](docs/demo.gif)
 
 ---
 
