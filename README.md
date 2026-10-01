@@ -1,16 +1,21 @@
 # ✋🎨 Air Draw
 
+![Python](https://img.shields.io/badge/Python-3.10-blue)
+![OpenCV](https://img.shields.io/badge/OpenCV-green)
+![MediaPipe](https://img.shields.io/badge/MediaPipe-orange)
+![License](https://img.shields.io/badge/License-MIT-yellow)
+
 **Dessine dans les airs avec ta main.** Air Draw est une application de dessin sans contact : une webcam, une main, et quelques lignes de Python suffisent. Pas de souris, pas de clavier, pas d'écran tactile.
 
 Le projet s'appuie sur la **vision par ordinateur** (Computer Vision), le **suivi de la main** (Hand Tracking) et la **reconnaissance de gestes** (Hand Gesture Recognition) pour transformer des mouvements naturels en interface utilisateur.
 
-## 🎬 Vidéo de démonstration
+## 🎬 Démonstration
 
-[![Voir la vidéo sur YouTube](https://img.youtube.com/vi/D3BjOMaaXmA/maxresdefault.jpg)](https://youtu.be/D3BjOMaaXmA)
+<p align="center">
+  <img src="docs/demo.gif" width="640" alt="Démo Air Draw">
+</p>
 
-▶️ **[Regarder la vidéo sur YouTube](https://youtu.be/D3BjOMaaXmA)**
-
-![Démo Air Draw](docs/demo.gif)
+▶️ **[Voir la vidéo complète sur YouTube](https://youtu.be/D3BjOMaaXmA)**
 
 ---
 
@@ -50,7 +55,7 @@ Le projet s'appuie sur la **vision par ordinateur** (Computer Vision), le **suiv
 ```
 Webcam
   ↓  camera.py       ouvre la webcam (essaie les index 0, 1, 2)
-  ↓  app.py          lit chaque image et la retourne comme un miroir
+  ↓  app.py          orchestre tout le pipeline : lit chaque image et la retourne comme un miroir
 MediaPipe Hands
   ↓  hand_tracker.py détecte la main et ses 21 landmarks
 gestures.py
@@ -88,6 +93,8 @@ air-draw/
 ├── requirements.txt   # Dépendances Python
 ├── LICENSE            # Licence MIT
 ├── .gitignore
+├── docs/
+│   └── demo.gif       # GIF de démonstration affiché dans le README
 └── output/            # Dessins sauvegardés (créé automatiquement, ignoré par Git)
 ```
 
@@ -97,7 +104,7 @@ Chaque fichier a une seule responsabilité : `main.py` reste minimal, `app.py` o
 
 ## 🚀 Installation
 
-**Prérequis** : Python 3.10 (ou version compatible avec MediaPipe) et une webcam.
+**Prérequis** : Python 3.10 recommandé (MediaPipe ne prend pas en charge toutes les versions de Python, en particulier les plus récentes) et une webcam.
 
 ```bash
 # 1. Cloner le dépôt
@@ -133,7 +140,7 @@ chmod +x run.sh   # une seule fois
 4. Ouvre la **paume** pour gommer.
 5. Fais un **pouce levé** (poing fermé, pouce bien vertical) pendant environ 1 seconde pour sauvegarder. Le fichier apparaît dans `output/`.
 
-Une temporisation de 1,5 s évite de créer plusieurs fichiers à la suite.
+Un délai de 1,5 s entre deux sauvegardes évite de créer plusieurs fichiers à la suite.
 
 ---
 
