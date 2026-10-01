@@ -1,0 +1,17 @@
+cat > .gitignore << 'EOF'
+# Images générées par l'application
+output/
+
+# Environnement virtuel Python
+.venv/
+venv/
+
+# Cache Python
+__pycache__/
+*.pyc
+
+# Éditeur / système
+.vscode/
+.idea/
+.DS_Store
+EOF
