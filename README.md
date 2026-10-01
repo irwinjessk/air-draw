@@ -4,7 +4,13 @@
 
 Le projet s'appuie sur la **vision par ordinateur** (Computer Vision), le **suivi de la main** (Hand Tracking) et la **reconnaissance de gestes** (Hand Gesture Recognition) pour transformer des mouvements naturels en interface utilisateur.
 
-> 📸 *Ajoute ici un GIF ou une capture d'écran de démonstration (`docs/demo.gif`).*
+## 🎬 Vidéo de démonstration
+
+[![Voir la vidéo sur YouTube](https://img.youtube.com/vi/D3BjOMaaXmA/maxresdefault.jpg)](https://youtu.be/D3BjOMaaXmA)
+
+▶️ **[Regarder la vidéo sur YouTube](https://youtu.be/D3BjOMaaXmA)**
+
+> 📸 *Ajoute ici un GIF de démonstration (`docs/demo.gif`) :*
 >
 > `![Démo Air Draw](docs/demo.gif)`
 
@@ -45,21 +51,24 @@ Le projet s'appuie sur la **vision par ordinateur** (Computer Vision), le **suiv
 
 ```
 Webcam
-  ↓  OpenCV capture le flux vidéo (image miroir)
+  ↓  camera.py       ouvre la webcam (essaie les index 0, 1, 2)
+  ↓  app.py          lit chaque image et la retourne comme un miroir
 MediaPipe Hands
-  ↓  détecte la main et ses 21 landmarks
+  ↓  hand_tracker.py détecte la main et ses 21 landmarks
 gestures.py
   ↓  analyse la position des doigts → DRAW / SELECT / ERASE / SAVE / NONE
-main.py
+app.py
   ↓  transforme le geste en action (trait, couleur, gomme, sauvegarde)
-Canvas virtuel (NumPy)
-  ↓  fusionné avec la vidéo, puis affiché avec OpenCV
+canvas.py (NumPy)
+  ↓  calque de dessin fusionné avec la vidéo
+ui.py
+  ↓  menu, barre d'aide et statut, puis affichage avec OpenCV
 output/drawing_AAAAMMJJ_HHMMSS.png
 ```
 
-1. **Capture** : OpenCV lit la webcam et retourne l'image comme un miroir.
+1. **Capture** : OpenCV lit la webcam et l'image est retournée comme un miroir.
 2. **Détection** : MediaPipe Hands localise la main et ses 21 points de repère.
-3. **Reconnaissance** : une couche dédiée compare la position des extrémités des doigts à leurs articulations pour déterminer quels doigts sont levés, puis en déduit le geste.
+3. **Reconnaissance** : `gestures.py` compare la position des extrémités des doigts à leurs articulations pour déterminer quels doigts sont levés, puis en déduit le geste.
 4. **Action** : en mode dessin, la position de l'index est lissée (EMA) puis reliée au point précédent pour former un trait sur le canvas.
 5. **Affichage** : le canvas (fond noir = transparent) est superposé à la vidéo, avec le menu et les informations d'état.
 
@@ -69,13 +78,22 @@ output/drawing_AAAAMMJJ_HHMMSS.png
 
 ```
 air-draw/
-├── main.py            # Boucle principale : webcam, gestes → actions, affichage, sauvegarde
+├── main.py            # Point d'entrée : lance l'application
+├── app.py             # Boucle principale : lit la webcam, associe chaque geste à une action
+├── config.py          # Toutes les constantes (tailles, seuils, couleurs, textes)
+├── camera.py          # Ouverture de la webcam
+├── hand_tracker.py    # Wrapper MediaPipe : détection de la main et des landmarks
 ├── gestures.py        # Classification des gestes + lissage EMA
-├── ui.py              # Menu de couleurs (boutons, affichage, détection de survol)
+├── canvas.py          # Calque de dessin : traits, gomme, fusion avec la vidéo, sauvegarde PNG
+├── ui.py              # Interface : menu de couleurs, barre d'aide, statut, détection du survol
+├── run.sh             # Script de lancement
 ├── requirements.txt   # Dépendances Python
+├── LICENSE            # Licence MIT
 ├── .gitignore
 └── output/            # Dessins sauvegardés (créé automatiquement, ignoré par Git)
 ```
+
+Chaque fichier a une seule responsabilité : `main.py` reste minimal, `app.py` orchestre, et les autres modules (`camera`, `hand_tracker`, `gestures`, `canvas`, `ui`) se concentrent chacun sur une tâche précise. Les valeurs réglables sont toutes regroupées dans `config.py`.
 
 ---
 
@@ -85,19 +103,26 @@ air-draw/
 
 ```bash
 # 1. Cloner le dépôt
-git clone https://github.com/TON_USERNAME/air-draw.git
+git clone https://github.com/irwinjessk/air-draw.git
 cd air-draw
 
 # 2. Créer et activer un environnement virtuel
-python3 -m venv .venv
-source .venv/bin/activate        # Linux / macOS
-# .venv\Scripts\activate         # Windows
+python3 -m venv venv
+source venv/bin/activate        # Linux / macOS
+# venv\Scripts\activate         # Windows
 
 # 3. Installer les dépendances
 pip install -r requirements.txt
 
 # 4. Lancer l'application
 python main.py
+```
+
+Sous Linux / macOS, tu peux aussi utiliser le script de lancement :
+
+```bash
+chmod +x run.sh   # une seule fois
+./run.sh
 ```
 
 ---
@@ -116,20 +141,25 @@ Une temporisation de 1,5 s évite de créer plusieurs fichiers à la suite.
 
 ## 🔧 Paramètres modifiables
 
-| Paramètre | Fichier | Rôle |
-|-----------|---------|------|
-| `BRUSH` | `main.py` | Épaisseur du pinceau |
-| `ERASER` | `main.py` | Rayon de la gomme |
-| `EMAPoint(alpha=0.32)` | `main.py` | Lissage : plus petit = plus fluide mais plus lent |
-| `min_detection_confidence`, `min_tracking_confidence` | `main.py` | Sensibilité de MediaPipe |
-| Seuils des doigts | `gestures.py` | Ajustent la reconnaissance de chaque geste |
+Tous les réglages se trouvent dans **`config.py`** :
+
+| Paramètre | Rôle |
+|-----------|------|
+| `BRUSH_SIZE` | Épaisseur du pinceau |
+| `ERASER_RADIUS` | Rayon de la gomme |
+| `SMOOTHING_ALPHA` | Lissage : plus petit = plus fluide mais plus lent |
+| `MIN_DETECTION_CONFIDENCE`, `MIN_TRACKING_CONFIDENCE` | Sensibilité de MediaPipe |
+| `SAVE_COOLDOWN` | Délai minimum entre deux sauvegardes par geste |
+| `FINGER_MARGIN`, `THUMB_TIP_MARGIN`, `THUMB_FIST_MARGIN` | Seuils de reconnaissance des doigts |
+| `PALETTE` | Couleurs du menu |
+| `CAMERA_INDICES`, `FRAME_WIDTH`, `FRAME_HEIGHT` | Choix et résolution de la webcam |
 
 ---
 
 ## 🩺 Dépannage
 
 - **« Impossible d'ouvrir la webcam »** : ferme les applications qui l'utilisent (Chrome, Meet, Zoom...).
-- **Un geste n'est pas reconnu** : regarde la ligne `Geste: ...` affichée en bas de la fenêtre pour voir ce que le programme comprend, puis ajuste ton geste ou les seuils dans `gestures.py`.
+- **Un geste n'est pas reconnu** : regarde la ligne `Geste: ...` affichée en bas de la fenêtre pour voir ce que le programme comprend, puis ajuste ton geste ou les seuils dans `config.py`.
 - **Avertissements Qt / Wayland / protobuf dans le terminal** : ils sont sans gravité et n'empêchent pas l'application de fonctionner.
 
 ---
@@ -155,7 +185,7 @@ Une temporisation de 1,5 s évite de créer plusieurs fichiers à la suite.
 
 ## 👤 Auteur
 
-Projet réalisé par [@irwin_jess](https://github.com/irwinjessk/air-draw.git).
+Projet réalisé par [@irwinjessk](https://github.com/irwinjessk).
 
 Les retours et suggestions sont les bienvenus : ouvre une *issue* ou propose une *pull request*.
 
